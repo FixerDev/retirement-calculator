@@ -1,0 +1,98 @@
+<div id="retire-calc" style="font-family:Arial, Helvetica, sans-serif; background:#f6fbf5; padding:30px; border-radius:14px; border:2px solid #cde5c6; max-width:850px; margin:auto;">
+
+<h2 style="margin-top:0;color:#1f4d2b;">Australian Retirement Cost Calculator</h2>
+<p style="color:#4b6f55;font-size:14px;margin-bottom:25px;">
+Choose a town and see if your income is enough to live there comfortably.
+</p>
+
+<label style="font-weight:bold;color:#1f4d2b;">Your yearly income</label>
+<input type="range" id="incomeSlider" min="20000" max="80000" step="500" value="30600" style="width:100%;margin-top:10px;">
+<p style="font-size:18px;font-weight:bold;color:#1f4d2b;margin-top:5px;">$<span id="incomeValue">30,600</span> per year</p>
+
+<hr style="margin:25px 0;">
+
+<label style="font-weight:bold;color:#1f4d2b;">Choose a town</label>
+<select id="townSelect" style="width:100%;padding:12px;margin-top:10px;border-radius:8px;border:1px solid #bcd9b3;font-size:15px;">
+<option value="">Select a town</option>
+<option value="charleville">Charleville (QLD)</option>
+<option value="whyalla">Whyalla (SA)</option>
+<option value="stavell">Stawell (VIC)</option>
+<option value="peterborough">Peterborough (SA)</option>
+<option value="narrandera">Narrandera (NSW)</option>
+<option value="queenstown">Queenstown (TAS)</option>
+<option value="ingham">Ingham (QLD)</option>
+<option value="deniliquin">Deniliquin (NSW)</option>
+</select>
+
+<div id="resultBox" style="margin-top:30px;padding:20px;background:#ffffff;border-radius:12px;border:1px solid #cde5c6;display:none;">
+<h3 style="margin-top:0;color:#1f4d2b;">Estimated Monthly Living Cost</h3>
+
+<p><strong>Rent:</strong> $<span id="rentVal"></span></p>
+<p><strong>Groceries:</strong> $<span id="foodVal"></span></p>
+<p><strong>Electricity:</strong> $<span id="powerVal"></span></p>
+<p><strong>Total Monthly Cost:</strong> $<span id="totalVal"></span></p>
+
+<hr>
+
+<p style="font-size:16px;font-weight:bold;color:#1f4d2b;">Money left after expenses:</p>
+<p id="leftText" style="font-size:18px;font-weight:bold;"></p>
+</div>
+
+</div>
+
+<script>
+const towns = {
+charleville:{rent:580,food:300,power:120},
+whyalla:{rent:650,food:300,power:130},
+stavell:{rent:600,food:280,power:120},
+peterborough:{rent:550,food:270,power:120},
+narrandera:{rent:700,food:300,power:130},
+queenstown:{rent:600,food:280,power:130},
+ingham:{rent:700,food:300,power:130},
+deniliquin:{rent:700,food:300,power:130}
+};
+
+const slider = document.getElementById("incomeSlider");
+const incomeValue = document.getElementById("incomeValue");
+const townSelect = document.getElementById("townSelect");
+
+slider.oninput = function(){
+incomeValue.innerText = Number(slider.value).toLocaleString();
+calculate();
+}
+
+townSelect.onchange = calculate;
+
+function calculate(){
+const town = towns[townSelect.value];
+if(!town) return;
+
+const yearlyIncome = Number(slider.value);
+const monthlyIncome = yearlyIncome/12;
+
+const totalMonthly = town.rent + town.food + town.power;
+
+document.getElementById("rentVal").innerText = town.rent;
+document.getElementById("foodVal").innerText = town.food;
+document.getElementById("powerVal").innerText = town.power;
+document.getElementById("totalVal").innerText = totalMonthly;
+
+const left = monthlyIncome - totalMonthly;
+const leftBox = document.getElementById("leftText");
+
+if(left > 300){
+leftBox.innerHTML = "$"+left.toFixed(0)+" left each month (comfortable)";
+leftBox.style.color = "green";
+}
+else if(left > 0){
+leftBox.innerHTML = "$"+left.toFixed(0)+" left each month (very tight)";
+leftBox.style.color = "orange";
+}
+else{
+leftBox.innerHTML = "Not enough income for this town";
+leftBox.style.color = "red";
+}
+
+document.getElementById("resultBox").style.display = "block";
+}
+</script>
