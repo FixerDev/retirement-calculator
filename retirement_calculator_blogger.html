@@ -1,0 +1,234 @@
+<!-- ============================================================
+     MR AUSTRAL — Australian Retirement Town Calculator
+     Paste this entire block into Blogger > New Post > HTML view
+     ============================================================ -->
+
+<style>
+  #arc-calc * { box-sizing: border-box; margin: 0; padding: 0; font-family: Georgia, 'Times New Roman', serif; }
+  #arc-calc { background: #f7faf5; border: 1px solid #c8dfc0; border-radius: 12px; padding: 28px 24px; max-width: 780px; margin: 24px auto; }
+  #arc-calc h2 { font-size: 22px; font-weight: 700; color: #1a3d1f; margin-bottom: 4px; }
+  #arc-calc .arc-sub { font-size: 14px; color: #4a6b4f; margin-bottom: 24px; line-height: 1.5; }
+  #arc-calc .arc-section-label { font-size: 11px; font-weight: 700; color: #4a6b4f; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+  #arc-calc .arc-town-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 7px; margin-bottom: 22px; }
+  #arc-calc .arc-town-btn { padding: 9px 10px; border: 1px solid #b5d4a8; border-radius: 8px; background: #fff; color: #2d5a35; font-size: 13px; font-family: Georgia, serif; cursor: pointer; text-align: left; transition: background 0.15s, border-color 0.15s; }
+  #arc-calc .arc-town-btn:hover { background: #eaf4e5; border-color: #7dba6e; }
+  #arc-calc .arc-town-btn.arc-selected { border: 2px solid #2d8a3e; background: #d6f0d0; color: #1a3d1f; }
+  #arc-calc .arc-town-btn .arc-state { font-size: 11px; color: #5a8a62; display: block; margin-top: 2px; font-family: Georgia, serif; }
+  #arc-calc .arc-town-btn.arc-selected .arc-state { color: #2d5a35; }
+  #arc-calc .arc-town-btn.arc-disabled { opacity: 0.45; cursor: not-allowed; }
+  #arc-calc .arc-income-block { background: #e8f5e2; border: 1px solid #b5d4a8; border-radius: 10px; padding: 16px 18px; margin-bottom: 22px; }
+  #arc-calc .arc-income-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  #arc-calc .arc-income-label { font-size: 14px; color: #2d5a35; font-weight: 700; }
+  #arc-calc .arc-income-val { font-size: 22px; font-weight: 700; color: #1a3d1f; }
+  #arc-calc .arc-slider { width: 100%; accent-color: #2d8a3e; height: 6px; cursor: pointer; }
+  #arc-calc .arc-slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: #5a8a62; margin-top: 5px; }
+  #arc-calc .arc-pension-note { font-size: 12px; color: #4a6b4f; margin-top: 8px; padding-top: 8px; border-top: 1px solid #b5d4a8; }
+  #arc-calc .arc-no-sel { text-align: center; padding: 28px 16px; background: #edf7e8; border-radius: 10px; font-size: 14px; color: #4a6b4f; border: 1px dashed #b5d4a8; }
+  #arc-calc .arc-results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; margin-bottom: 18px; }
+  #arc-calc .arc-card { background: #fff; border: 1px solid #c8dfc0; border-radius: 10px; padding: 16px; }
+  #arc-calc .arc-card.arc-best { border: 2px solid #2d8a3e; }
+  #arc-calc .arc-best-badge { display: inline-block; background: #2d8a3e; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; margin-bottom: 8px; font-family: Georgia, serif; letter-spacing: 0.03em; }
+  #arc-calc .arc-card-name { font-size: 16px; font-weight: 700; color: #1a3d1f; }
+  #arc-calc .arc-card-state { font-size: 12px; color: #5a8a62; margin-bottom: 12px; }
+  #arc-calc .arc-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid #eaf4e5; font-size: 13px; }
+  #arc-calc .arc-row:last-of-type { border-bottom: none; }
+  #arc-calc .arc-row .arc-lbl { color: #5a8a62; }
+  #arc-calc .arc-row .arc-val { font-weight: 700; color: #1a3d1f; }
+  #arc-calc .arc-surplus { margin-top: 12px; padding: 9px 11px; border-radius: 8px; font-size: 13px; font-weight: 700; text-align: center; }
+  #arc-calc .arc-surplus.arc-pos { background: #d6f0d0; color: #1a3d1f; border: 1px solid #7dba6e; }
+  #arc-calc .arc-surplus.arc-tight { background: #fdf3dc; color: #7a5000; border: 1px solid #e8c96a; }
+  #arc-calc .arc-surplus.arc-neg { background: #fdecea; color: #7a1f1f; border: 1px solid #e8a09a; }
+  #arc-calc .arc-bars { margin-bottom: 22px; }
+  #arc-calc .arc-bar-row { margin-bottom: 12px; }
+  #arc-calc .arc-bar-top { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 3px; }
+  #arc-calc .arc-bar-name { font-weight: 700; color: #1a3d1f; }
+  #arc-calc .arc-bar-amt { color: #4a6b4f; }
+  #arc-calc .arc-bar-track { height: 18px; background: #e0eeda; border-radius: 6px; overflow: hidden; }
+  #arc-calc .arc-bar-fill { height: 100%; border-radius: 6px; transition: width 0.4s ease; }
+  #arc-calc .arc-tip { font-size: 12px; color: #4a6b4f; padding: 12px 14px; background: #eaf4e5; border-radius: 8px; border-left: 4px solid #2d8a3e; line-height: 1.6; margin-top: 4px; }
+  #arc-calc .arc-disclaimer { font-size: 11px; color: #7a9a7f; margin-top: 14px; line-height: 1.5; text-align: center; }
+  #arc-calc .arc-max-note { font-size: 12px; color: #7a5000; background: #fdf3dc; border: 1px solid #e8c96a; border-radius: 6px; padding: 7px 10px; margin-bottom: 14px; display: none; }
+  @media (max-width: 520px) {
+    #arc-calc { padding: 18px 14px; }
+    #arc-calc .arc-town-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+    #arc-calc .arc-results-grid { grid-template-columns: 1fr; }
+    #arc-calc .arc-income-val { font-size: 18px; }
+  }
+</style>
+
+<div id="arc-calc">
+  <h2>&#127807; Australian Retirement Town Calculator</h2>
+  <p class="arc-sub">Select up to 4 towns to compare living costs against your income. All figures are 2025–26 estimates based on regional data.</p>
+
+  <div class="arc-section-label">Step 1 — Choose your towns (up to 4)</div>
+  <div class="arc-town-grid" id="arcTownGrid"></div>
+  <div class="arc-max-note" id="arcMaxNote">&#9888; You've selected 4 towns — deselect one to add another.</div>
+
+  <div class="arc-section-label">Step 2 — Set your annual income</div>
+  <div class="arc-income-block">
+    <div class="arc-income-top">
+      <span class="arc-income-label">Annual income</span>
+      <span class="arc-income-val" id="arcIncomeVal">$30,600</span>
+    </div>
+    <input class="arc-slider" type="range" id="arcSlider" min="20000" max="100000" step="500" value="30600">
+    <div class="arc-slider-labels"><span>$20,000</span><span>$50,000</span><span>$100,000</span></div>
+    <div class="arc-pension-note">&#9432; The full Age Pension for a single Australian (2025) is $30,600/yr ($1,178.70/fortnight). For couples it is $46,020/yr combined.</div>
+  </div>
+
+  <div id="arcOutput"></div>
+
+  <p class="arc-disclaimer">Estimates only. Costs vary by household size, lifestyle, and individual circumstances. Rental figures based on median weekly rents. Healthcare gap = typical out-of-pocket expenses not covered by Medicare. Always seek independent financial advice before making retirement decisions.</p>
+</div>
+
+<script>
+(function() {
+  var TOWNS = [
+    { id:'vharbor',    name:'Victor Harbor',  state:'SA',  rent:350, grocery:360, util:160, transport:80,  health:90,  leisure:100, med:487000 },
+    { id:'mgambier',   name:'Mount Gambier',  state:'SA',  rent:370, grocery:330, util:165, transport:65,  health:80,  leisure:80,  med:365000 },
+    { id:'portaugusta',name:'Port Augusta',   state:'SA',  rent:300, grocery:330, util:155, transport:60,  health:75,  leisure:65,  med:220000 },
+    { id:'mbarker',    name:'Mount Barker',   state:'SA',  rent:595, grocery:340, util:155, transport:90,  health:85,  leisure:100, med:770000 },
+    { id:'cooberpedy', name:'Coober Pedy',    state:'SA',  rent:200, grocery:410, util:80,  transport:60,  health:70,  leisure:50,  med:91000  },
+    { id:'sthelens',   name:'St Helens',      state:'TAS', rent:430, grocery:360, util:190, transport:60,  health:85,  leisure:90,  med:520000 },
+    { id:'armidale',   name:'Armidale',       state:'NSW', rent:460, grocery:350, util:180, transport:70,  health:80,  leisure:80,  med:575000 },
+    { id:'shepparton', name:'Shepparton',     state:'VIC', rent:490, grocery:320, util:160, transport:70,  health:80,  leisure:75,  med:430000 },
+    { id:'geraldton',  name:'Geraldton',      state:'WA',  rent:370, grocery:350, util:165, transport:75,  health:85,  leisure:80,  med:400000 },
+    { id:'esperance',  name:'Esperance',      state:'WA',  rent:500, grocery:390, util:170, transport:80,  health:90,  leisure:90,  med:570000 },
+    { id:'rockhampton',name:'Rockhampton',    state:'QLD', rent:350, grocery:320, util:155, transport:65,  health:80,  leisure:75,  med:345000 },
+    { id:'charleville',name:'Charleville',    state:'QLD', rent:250, grocery:340, util:150, transport:55,  health:65,  leisure:50,  med:165000 },
+    { id:'maryborough',name:'Maryborough',    state:'QLD', rent:350, grocery:330, util:155, transport:65,  health:80,  leisure:80,  med:320000 },
+    { id:'tenterfield',name:'Tenterfield',    state:'NSW', rent:430, grocery:340, util:175, transport:65,  health:75,  leisure:70,  med:424000 },
+    { id:'bairnsdale', name:'Bairnsdale',     state:'VIC', rent:410, grocery:330, util:165, transport:70,  health:80,  leisure:75,  med:410000 },
+    { id:'albanywA',   name:'Albany',         state:'WA',  rent:430, grocery:360, util:165, transport:75,  health:85,  leisure:90,  med:500000 },
+    { id:'portmac',    name:'Port Macquarie', state:'NSW', rent:550, grocery:370, util:170, transport:80,  health:90,  leisure:110, med:730000 },
+    { id:'hervey',     name:'Hervey Bay',     state:'QLD', rent:520, grocery:360, util:165, transport:80,  health:90,  leisure:100, med:620000 },
+    { id:'orange',     name:'Orange',         state:'NSW', rent:480, grocery:350, util:175, transport:70,  health:80,  leisure:85,  med:590000 },
+    { id:'ballarat',   name:'Ballarat',       state:'VIC', rent:450, grocery:340, util:170, transport:75,  health:80,  leisure:85,  med:520000 },
+  ];
+
+  var selected = [];
+  var income = 30600;
+
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-AU'); }
+  function fmtK(n) { return '$' + Math.round(n / 1000) + 'K'; }
+  function monthly(t) { return t.rent * 4.33 + t.grocery + t.util + t.transport + t.health + t.leisure; }
+  function annual(t) { return monthly(t) * 12; }
+
+  function renderGrid() {
+    var g = document.getElementById('arcTownGrid');
+    g.innerHTML = '';
+    var atMax = selected.length >= 4;
+    TOWNS.forEach(function(t) {
+      var isSel = selected.indexOf(t.id) !== -1;
+      var btn = document.createElement('button');
+      btn.className = 'arc-town-btn' + (isSel ? ' arc-selected' : '') + (!isSel && atMax ? ' arc-disabled' : '');
+      btn.innerHTML = t.name + '<span class="arc-state">' + t.state + '</span>';
+      btn.onclick = function() { toggle(t.id); };
+      g.appendChild(btn);
+    });
+    document.getElementById('arcMaxNote').style.display = atMax ? 'block' : 'none';
+  }
+
+  function toggle(id) {
+    var idx = selected.indexOf(id);
+    if (idx !== -1) {
+      selected.splice(idx, 1);
+    } else {
+      if (selected.length >= 4) return;
+      selected.push(id);
+    }
+    renderGrid();
+    renderOutput();
+  }
+
+  function renderOutput() {
+    var out = document.getElementById('arcOutput');
+    if (selected.length === 0) {
+      out.innerHTML = '<div class="arc-no-sel">&#127807; Select at least one town above to see your cost comparison.</div>';
+      return;
+    }
+
+    var towns = selected.map(function(id) { return TOWNS.find(function(t) { return t.id === id; }); });
+    var annuals = towns.map(function(t) { return annual(t); });
+    var surpluses = towns.map(function(t, i) { return income - annuals[i]; });
+    var maxAnnual = Math.max.apply(null, annuals);
+    var bestIdx = surpluses.indexOf(Math.max.apply(null, surpluses));
+
+    var html = '';
+
+    if (towns.length > 1) {
+      html += '<div class="arc-section-label">Total annual costs comparison</div>';
+      html += '<div class="arc-bars">';
+      towns.forEach(function(t, i) {
+        var w = Math.round((annuals[i] / maxAnnual) * 100);
+        var s = Math.round(surpluses[i]);
+        var col = s > 2000 ? '#2d8a3e' : s >= 0 ? '#c8950a' : '#c0392b';
+        html += '<div class="arc-bar-row">';
+        html += '<div class="arc-bar-top"><span class="arc-bar-name">' + t.name + '</span><span class="arc-bar-amt">' + fmt(annuals[i]) + '/yr &nbsp; ' + fmt(Math.round(monthly(t))) + '/mo</span></div>';
+        html += '<div class="arc-bar-track"><div class="arc-bar-fill" style="width:' + w + '%;background:' + col + '"></div></div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '<div class="arc-section-label">Detailed breakdown</div>';
+    html += '<div class="arc-results-grid">';
+
+    towns.forEach(function(t, i) {
+      var s = Math.round(surpluses[i]);
+      var mon = Math.round(monthly(t));
+      var pct = Math.round((annuals[i] / income) * 100);
+      var isBest = i === bestIdx && towns.length > 1;
+      var surpClass = s > 2000 ? 'arc-pos' : s >= 0 ? 'arc-tight' : 'arc-neg';
+      var surpText = s > 2000
+        ? '&#10003; ' + fmt(s) + ' left over per year'
+        : s >= 0
+        ? '&#9888; Only ' + fmt(s) + ' remaining — tight'
+        : '&#10007; ' + fmt(Math.abs(s)) + ' shortfall per year';
+
+      html += '<div class="arc-card' + (isBest ? ' arc-best' : '') + '">';
+      if (isBest) html += '<div class="arc-best-badge">&#9733; Best value</div>';
+      html += '<div class="arc-card-name">' + t.name + '</div>';
+      html += '<div class="arc-card-state">' + t.state + ' &nbsp;·&nbsp; Median house ' + fmtK(t.med) + '</div>';
+      html += '<div class="arc-row"><span class="arc-lbl">Weekly rent</span><span class="arc-val">' + fmt(t.rent) + '/wk</span></div>';
+      html += '<div class="arc-row"><span class="arc-lbl">Groceries</span><span class="arc-val">' + fmt(t.grocery) + '/mo</span></div>';
+      html += '<div class="arc-row"><span class="arc-lbl">Utilities</span><span class="arc-val">' + fmt(t.util) + '/mo</span></div>';
+      html += '<div class="arc-row"><span class="arc-lbl">Transport</span><span class="arc-val">' + fmt(t.transport) + '/mo</span></div>';
+      html += '<div class="arc-row"><span class="arc-lbl">Healthcare gap</span><span class="arc-val">' + fmt(t.health) + '/mo</span></div>';
+      html += '<div class="arc-row"><span class="arc-lbl">Leisure</span><span class="arc-val">' + fmt(t.leisure) + '/mo</span></div>';
+      html += '<div class="arc-row"><span class="arc-lbl">Total monthly</span><span class="arc-val">' + fmt(mon) + '</span></div>';
+      html += '<div class="arc-row"><span class="arc-lbl">% of your income</span><span class="arc-val">' + pct + '%</span></div>';
+      html += '<div class="arc-surplus ' + surpClass + '">' + surpText + '</div>';
+      html += '</div>';
+    });
+
+    html += '</div>';
+
+    if (towns.length > 1) {
+      var best = towns[bestIdx];
+      html += '<div class="arc-tip">Based on your income of ' + fmt(income) + '/yr, <strong>' + best.name + '</strong> gives you the most financial breathing room out of your selected towns. Median house price: ' + fmtK(best.med) + '. Median weekly rent: ' + fmt(best.rent) + '.</div>';
+    } else {
+      var s0 = Math.round(surpluses[0]);
+      var msg = s0 > 2000
+        ? '<strong>' + towns[0].name + '</strong> works on your income — roughly ' + fmt(s0) + ' left over per year after essentials. Add more towns to compare.'
+        : s0 >= 0
+        ? '<strong>' + towns[0].name + '</strong> is tight on your income. Only ' + fmt(s0) + ' remaining after essentials. Try adding other towns to compare.'
+        : '<strong>' + towns[0].name + '</strong> shows a shortfall of ' + fmt(Math.abs(s0)) + ' per year on your current income. Try adjusting the slider or comparing other towns.';
+      html += '<div class="arc-tip">' + msg + '</div>';
+    }
+
+    out.innerHTML = html;
+  }
+
+  document.getElementById('arcSlider').addEventListener('input', function() {
+    income = parseInt(this.value);
+    document.getElementById('arcIncomeVal').textContent = fmt(income);
+    renderOutput();
+  });
+
+  renderGrid();
+  renderOutput();
+})();
+</script>
+<!-- ============================================================
+     END MR AUSTRAL RETIREMENT CALCULATOR
+     ============================================================ -->
